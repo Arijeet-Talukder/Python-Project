@@ -1,10 +1,13 @@
 from __future__ import annotations
 from rich.console import Console
 from rich.table import Table
+from manager import BankManager
+
 
 class CLI:
-  def __init__(self) -> None:
+  def __init__(self, manager: BankManager | None = None) -> None:
         self.console = Console()
+        self.manager = manager if manager is not None else BankManager()
   def print_menu(self) -> None:
         self.console.print("\n[bold blue]------ Banking System ------[/bold blue]")
         self.console.print("1. Create Account")
@@ -19,6 +22,9 @@ class CLI:
         
   def create_account(self) -> None:
         name = input("Enter name: ").strip()
+        if not name:
+            self.console.print("[red]Error: Name cannot be empty![/red]")
+            return
         try:
             balance = float(input("Enter initial balance: "))
         except ValueError:
@@ -32,8 +38,11 @@ class CLI:
         try:
             acc_no = int(input("Account number: "))
             amount = float(input("Amount: "))
-            self.manager.deposit(acc_no, amount)
-            self.console.print("Deposit successful!")
+            success, message = self.manager.deposit(acc_no, amount)
+            if success:
+                self.console.print(message)
+            else:
+                self.console.print(f"[red]{message}[/red]")
         except Exception as e:
             self.console.print(f"Error: {e}")
 
@@ -41,8 +50,11 @@ class CLI:
         try:
             acc_no = int(input("Account number: "))
             amount = float(input("Amount: "))
-            self.manager.withdraw(acc_no, amount)
-            self.console.print("Withdraw successful!")
+            success, message = self.manager.withdraw(acc_no, amount)
+            if success:
+                self.console.print(message)
+            else:
+                self.console.print(f"[red]{message}[/red]")
         except Exception as e:
             self.console.print(f"Error: {e}")
 
@@ -51,8 +63,11 @@ class CLI:
             from_acc = int(input("From Account: "))
             to_acc = int(input("To Account: "))
             amount = float(input("Amount: "))
-            self.manager.transfer(from_acc, to_acc, amount)
-            self.console.print("Transfer successful!")
+            success, message = self.manager.transfer(from_acc, to_acc, amount)
+            if success:
+                self.console.print(message)
+            else:
+                self.console.print(f"[red]{message}[/red]")
         except Exception as e:
             self.console.print(f"Error: {e}")
 
@@ -94,8 +109,11 @@ class CLI:
   def delete_account(self) -> None:
         try:
             acc_no = int(input("Account number: "))
-            self.manager.delete_account(acc_no)
-            self.console.print("Account deleted!")
+            success, message = self.manager.delete_account(acc_no)
+            if success:
+                self.console.print(message)
+            else:
+                self.console.print(f"[red]{message}[/red]")
         except Exception as e:
             self.console.print(f"Error: {e}")
 
@@ -123,25 +141,23 @@ class CLI:
 
         match choice:
             case "1":
-                    self.console.print("Creating account...")
+                    self.create_account()
             case "2":
-                    self.console.print("Depositing funds...")
+                    self.deposit()
             case "3":
-                    self.console.print("Withdrawing funds...")
+                    self.withdraw()
             case "4":
-                    self.console.print("Transferring funds...")
+                    self.transfer()
             case "5":
-                    self.console.print("Listing accounts...")
+                    self.list_accounts()
             case "6":
-                    self.console.print("Searching account...")
+                    self.search_account()
             case "7":
-                    self.console.print("Deleting account...")
+                    self.delete_account()
             case "8":
-                    self.console.print("reporting...")
+                    self.report()
             case "9":
                     self.console.print("[bold red]Exiting... Goodbye![/bold red]")
                     break
             case _:
                     self.console.print("[bold red]Invalid choice![/bold red]")
-run_cli = CLI()
-run_cli.run()
