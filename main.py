@@ -1,13 +1,18 @@
-'''
-Starting point for Banking CLI
-'''
-
-from __future__ import annotations
-
+from manager import BankManager
+from storage import Storage
+from cli import CLI
 
 
 def main() -> None:
-    pass
+    manager = BankManager()
+    storage = Storage()   
+
+    manager.accounts = storage.load()
+
+    app = CLI(manager)
+    app.run()
+
+    storage.save(manager.accounts)
 
 
 if __name__ == "__main__":
